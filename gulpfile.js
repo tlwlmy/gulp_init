@@ -8,6 +8,8 @@ var minifyhtml = require('gulp-minify-html');    // html文件压缩
 var imagemin = require('gulp-imagemin');    // 图片压缩
 var pngquant = require('imagemin-pngquant');    //png图片压缩插件
 var livereload = require('gulp-livereload');    // 自动刷新页面
+var browserSync = require('browser-sync').create();    // 浏览器同步
+//var notify = require('gulp-notify');    // 更改提醒
 
 // js文件检查、合并、压缩
 gulp.task('script', function() {
@@ -17,6 +19,7 @@ gulp.task('script', function() {
     .pipe(concat('all.js'))
     .pipe(uglify())
     .pipe(gulp.dest('dist/js'))
+    .pipe(browserSync.stream());
 });
 
 // css文件压缩
@@ -24,13 +27,15 @@ gulp.task('css', function() {
   gulp.src('src/css/*.css')
     .pipe(minifycss())
     .pipe(gulp.dest('dist/css'))
+    .pipe(browserSync.stream());
 });
 
 // hmlt文件压缩
 gulp.task('html', function(){
-    gulp.src('src/html/*.html')
-        .pipe(minifyhtml())
-        .pipe(gulp.dest('dist/html'));
+  gulp.src('src/html/*.html')
+    .pipe(minifyhtml())
+    .pipe(gulp.dest('dist/html'))
+    .pipe(browserSync.stream());
 });
 
 // 图片压缩
@@ -41,7 +46,12 @@ gulp.task('images', function() {
       use: [pngquant()],    //使用pngquant来压缩png图片
     }))
     .pipe(gulp.dest('dist/images'))
+    .pipe(browserSync.stream());
 });
+
+
+// 构建
+gulp.task('build', ['script', 'css', 'html', 'images']);
 
 // 自动刷新页面
 gulp.task('auto', function() {
@@ -52,5 +62,15 @@ gulp.task('auto', function() {
   gulp.watch('src/images/*.images', ['images']);
 });
 
+// 重载
+gulp.task('browser-sync', function() {
+  browserSync.init({
+    server: {
+      baseDir: './dist'
+    },
+    startPath: ''
+  });
+});
+
 // 默认执行任务
-gulp.task('default', ['script', 'css', 'html', 'images', 'auto']);
+gulp.task('default', ['browser-sync', 'build', 'auto']);
