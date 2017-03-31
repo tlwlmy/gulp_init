@@ -53,4 +53,4 @@ gulp.task('auto', function() {
 });
 
 // 默认执行任务
-gulp.task('default', ['script', 'css', 'html', 'images']);
+gulp.task('default', ['script', 'css', 'html', 'images', 'auto']);
